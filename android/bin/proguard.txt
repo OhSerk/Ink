@@ -1,0 +1,6 @@
+# view res/layout/main.xml #generated:1
+-keep class .Ink { <init>(...); }
+
+# view AndroidManifest.xml #generated:1
+-keep class processing.test.ink.MainActivity { <init>(...); }
+

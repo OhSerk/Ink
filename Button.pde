@@ -1,0 +1,52 @@
+public class Button {
+  private int px, c, py, dim;
+  public int i;
+  private int turno;
+  Button() {
+  }
+  Button(int px, int c, int i) {
+    this.px = px;
+    this.c = c;
+    this.i = i;
+    py = 480;
+    dim = 50;
+    turno = 0;
+  }
+  Button(int px, int py, int c, int i, int turno) {
+    this.px = px;
+    this.c = c;
+    this.i = i;
+    this.py = py;
+    this.turno = turno;
+    dim = 35;
+  }
+  public void view() {
+    rect(px, py, 50*6/PApplet.parseInt(colors[k]), dim, color(c));
+    fill(0);
+   // text(str(i), px+25*6/PApplet.parseInt(colors[k]), py+dim/2, 20);
+    if (((mouseX >= px*width/360 && mouseX <= (px+(50*6/PApplet.parseInt(colors[k])))*width/360 && mouseY >= py*height/640 && mouseY <= (py+dim)*height/640 && rel) || (str(key).equals(str(i)) && kel)) 
+      && !end && scene.equals("R-Play") && (con || !animazione)) { //Se clicci sul bottone, il gioco non è finito, stai giocando e è finita l'animazione oppure non c'è allora fai..
+      println("x");
+      for (int j = 0; j < s[0].length; j++)
+        for (int i = 0; i < s.length; i++)
+          if (s[i][j].controller() && turno == s[i][j].giocatore)
+            if (s[i][j].c != this.c)
+              if (s[i][j].realC != this.c && (s[i][j].realC != colore(lol)||singleplayer)) {// && (s[0][0].realC != s[s.length-1][s[0].length-1].realC || singleplayer)) {
+                Col = s[i][j].realC = this.c;
+                if (!animazione && player1) cSQ = this.c;
+                if (!animazione && !player1) cSQ1 = this.c;
+                scambio = true;
+              } //else imhere = true;
+      if (scambio) {
+        println("sc");
+        lol = this.i;
+        delay = true;
+        nMosse++;
+        scambio = false;
+      }
+      rel = false;
+      mouseX = 0;
+    } else if (mouseX >= px*width/360 && mouseX <= (px+(50*6/PApplet.parseInt(colors[k])))*width/360 && mouseY >= 530*height/640 && mouseY <= 580*height/640 ) {
+    }
+  }
+}

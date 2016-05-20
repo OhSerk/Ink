@@ -1,0 +1,17 @@
+Play
+Options
+Highscore
+Credits
+Difficulty: 
+Grid: 
+Colors: 
+Complete
+You win!
+moves!
+Share
+Menu
+New
+Prec.
+Retry
+Succ.
+Resume

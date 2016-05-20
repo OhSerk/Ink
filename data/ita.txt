@@ -1,0 +1,17 @@
+Gioca
+Opzioni
+Record
+Crediti
+Difficoltà: 
+Griglia: 
+Colori: 
+Completato
+Hai vinto!
+mosse!
+Condividi
+Menù
+Nuovo
+Prec.
+Riprova
+Succ.
+Riprendi

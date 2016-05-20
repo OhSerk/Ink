@@ -1,0 +1,16 @@
+Gioca
+Opzioni
+Record
+Crediti
+Difficoltà: 
+Griglia: 
+Colori: 
+Completato
+Hai vinto!
+mosse!
+Condividi
+Menù
+Nuovo
+Riprendi
+Riprova
+Questo è un gioco il cui scopo è colorare \n l'intera griglia di un unico colore. \n Partendo dal quadrato in alto a sinistra \n cambiando il colore del quadrato \n controllerai tutti i quadrati adiacenti al tuo \n dello stesso colore.
