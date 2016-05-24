@@ -5,14 +5,6 @@ public class Square {
   int nc, NC;
   private boolean controller;
   public int giocatore = 2;
-  Square() {
-  }
-  Square (int px, int py) {
-    this.px = px;
-    this.py = py;
-    c = realC = colore();
-  }
-
   Square (int x, int y, float px, float py, boolean controller, float dim) {
     this.x = x;
     this.y = y;
@@ -22,16 +14,6 @@ public class Square {
     this.controller = controller;
     c = realC = nc = NC= colore();
   }
-
-  Square (int x, int y, int px, int py, boolean controller) {
-    this.x = x;
-    this.y = y;
-    this.px = px;
-    this.py = py;
-    this.controller = controller;
-    c = realC = colore();
-  }
-
   public void view() {
     int C;
     if (controller) {
@@ -57,23 +39,15 @@ public class Square {
   }
 
   public int colore() {
-    String[] x = split(fill[RI(b.length)], ',');
+    String[] x = split(col[RI(b.length)], ',');
     return color(PApplet.parseInt(x[0]), PApplet.parseInt(x[1]), PApplet.parseInt(x[2]));
   }
 
   public void newController() {
-    if (x+1 != s.length) {
-      pigrizia(x+1, y);
-    }
-    if (x-1 >= 0) {
-      pigrizia(x-1, y);
-    }
-    if (y+1 != s[0].length) {
-      pigrizia(x, y+1);
-    }
-    if (y-1 >= 0) {
-      pigrizia(x, y-1);
-    }
+    if (x+1 != s.length) pigrizia(x+1, y);
+    if (x-1 >= 0) pigrizia(x-1, y);
+    if (y+1 != s[0].length) pigrizia(x, y+1);
+    if (y-1 >= 0) pigrizia(x, y-1);
   }
 
   public void pigrizia(int a, int b) {
@@ -83,9 +57,6 @@ public class Square {
       if (giocatore == 0) g2++;
       else if (giocatore == 1) g1++;
     }
-  }
-  public void controller(boolean b) {
-    controller = b;
   }
 
   public void controller(boolean ll, int giocatore) {

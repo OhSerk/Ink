@@ -1,70 +1,74 @@
 //E' una features o e' un bug? //<>// //<>//
 Square[][] s;
 Button[] b, b2;
-public boolean con = false, imhere = true;
-boolean rel = false, kel = false, scambio = false, delay = true;
-int size, rx, ry, cSQ = color(0), cSQ1;
-int nMosse = 0, nQuad = 0, Col, nCol, f1, f2, f3;
-PImage rec[] = new PImage[2], play;
-static String scene = "Menu";
-static boolean end = false, animazione = true, singleplayer =true, player1 = true, local = true;
-String parola[], grid[], colors[], fill[], diff[], mosse[][][], salva[], record[];
+protected boolean con = false, imhere = true, rel = false, kel = false, scambio = false, delay = true;
+int size, rx, ry, cSQ = color(0), cSQ1, nMosse = 0, nQuad = 0, Col, nCol, f1, f2, f3;
+PImage rec[] = new PImage[2], play, logo, cose[] = new PImage[3];
+static String scene = "Menu", cambia="", swap[];
+static boolean end = false, animazione = true, singleplayer =true, player1 = true, local = true, backpressed = false;
+String parola[], grid[], colors[], fill[], diff[], mosse[][][], salva[], record[], col[];
 static int lol = 0; //Uso in button
-//Variabili di riavvio
+//Variabili per l'animazione del rettangolo
+int nk = 0; 
+boolean cont;
+float tS, sY; //
+int n=0, k=0, l=0, gr = 0, g1 =0, g2=0; //Indici di array (n = griglia) (k = colori) (l = difficolta') (gr = score) (g1 , g2 = punteggi finali)
+PFont font;
 public void settings() {
   orientation(PORTRAIT);
-  //fullScreen();
-  size(int(displayHeight*0.5625), displayHeight);
+  size(PApplet.parseInt(displayHeight*0.5625f), displayHeight, P2D);
 }
 
 public void setup() {
+  println(displayWidth, displayHeight);
+  println(System.getProperty("os.name"));
+  font = createFont("0.ttf", 30*width/360);
   rec[0] = loadImage("0.png");
   rec[1] = loadImage("1.png");
+  //cose[0] = cose[2] = loadImage("dito.png");
+  //cose[1] = loadImage("droga.png");
   play = loadImage("play.png");
-  String x;
-  int jj = RI(3);
-  if (jj == 0) x = "eng";
-  else if (jj == 1) x ="mat";
-  else x = "ita";
-  parola = loadStrings(x+".txt");
+  logo = loadImage("logo.png");
+  parola = swap = loadStrings("ita.txt");
   grid = loadStrings("griglia.txt");
   colors = loadStrings("colors.txt");
   fill = loadStrings("fill.txt");
+  col = loadStrings("fill.txt");
   diff = loadStrings("diff.txt");
   File f = new File(dataPath("savedata.txt"));
   if (f.exists())
     record = loadStrings(dataPath("savedata.txt"));
   else {
     record = loadStrings("vuoto.txt");
-    salvataggio();
+    salvataggio("savedata.txt", record);
   }
-  mosse = new String[colors.length][diff.length][grid.length];
-  for (int i = 0; i < mosse.length; i++) 
-    for (int j =0; j < diff.length; j++) {
-      mosse[i][j] = loadStrings(3+i+"-"+j+"col.txt");
-    }
+  /*  mosse = new String[colors.length][diff.length][grid.length];
+   for (int i = 0; i < mosse.length; i++) 
+   for (int j =0; j < diff.length; j++) 
+   mosse[i][j] = loadStrings(3+i+"-"+j+"col.txt");
+   */
+  scene = parola[19];
   noStroke();
   textAlign(CENTER);
   imageMode(CENTER);
-  //frameRate(10);
+  scene = "logo";
+  background(255);
 }
-float tS;
+
 public void draw() {
-  //animazione = frameRate >= 40;
   if ((mouseY > (sY+(tS*2))*height/640 || mouseY < sY*height/640)) {
     nk = 0;  
     cont = false;
-    //println(sY, tS);
   }
-
-  if (scene.equals("Menu")) {
+  if (scene.equals("logo")) {
+    if (frameCount > 200) scene = parola[19];
+    noTint();
+    image(logo, 180*width/360, 320*height/640, 180*width/360, 180*width/360);
+  } else if (scene.equals(parola[19])) {
     menu();
   } else if (scene.equals("Menu-b")) {
     reset(false);
-    scene = "Menu";
-  } else if (scene.equals("Play-b") && singleplayer) {
-    gioco_1();
-    pause();
+    scene = parola[19];
   } else if (scene.equals("R-Play") && singleplayer) {
     gioco_1();
   } else if (scene.equals("R-Play") && !singleplayer) {
@@ -74,39 +78,54 @@ public void draw() {
   } else if (scene.equals(parola[2])) {
     score();
   } else if (scene.equals(parola[1])) {
-    background(230);
-    String[] z = split(parola[15], "\n");
-    for (int i = 0; i < z.length; i++)  text(z[i], 180, 30+(i*30), 35);
-    if (rel) scene = "Menu";
+    options();
   } else if (scene.equals(parola[3])) {
-    background(230);
-    text("Serk (obviously)", 180, 320, 40);
-    if (rel) scene = "Menu";
-  }
+    background(0);
+    text("Serk", 180, 320, 40, colore(6), 6);
+    text(parola[19], 180, 40, 30, colore(6), 6);
+  } else if (scene.equals("x")) {
+    cambialingua();
+  } 
+  if (backpressed && scene.equals("R-Play")) pause();
   rel = kel = false;
-  rect(0, 550, 360,90, color(255));
-  text("Questo è un banner", 180, 590, 20, color(0), 7);
+  rect(0, 550, 360, 90, color(255));
+  text("Questo e' un banner", 180, 590, 20, color(0), 7);
 }
 
-void salvataggio() {
-  String salvo = dataPath("savedata.txt");
+public void salvataggio(String s, String[] save) {
+  String salvo = dataPath(s);
   File f = new File(salvo);
   if (f.exists())
     f.delete();
-  saveStrings(salvo, record);
+  saveStrings(salvo, save);
 }
 
-/*
-  public void onBackPressed(){
- if(Ink.scene.equals("R-Play")){
- Ink.scene = "Play-b"; 
- } else if(Ink.scene.equals("Play-b")){
- Ink.scene = "R-Play";
- } else {
- Ink.scene = "Menu"; 
- }
- }
- */
+public void options() {
+  background(0);
+  text(parola[19], 180, 40, 30, colore(6), 6);
+  text("< "+parola[26]+" >", 180, 120, 30, colore(0+(PApplet.parseInt(!animazione))), 0+(PApplet.parseInt(!animazione)));
+  text("< "+parola[27]+": "+parola[28]+" >", 180, 220, 30, colore(0), 0);
+  if (rel && mouseY >= 80*height/640 && mouseY <= 160*height/640) animazione = !animazione;
+  if (rel && mouseY >= 180*height/640 && mouseY <= 260*height/640) scene = "x";
+}
+
+public void cambialingua() {
+  if (parola[28].equals("English")) cambia = "ita";
+  else if (parola[28].equals("Italiano")) cambia = "eng";
+  parola = loadStrings(cambia+".txt");
+  scene = parola[1];
+  swap = parola;
+}  
+
+public void onBackPressed() {
+  if (Ink.scene.equals("R-Play") && Ink.singleplayer)
+    Ink.backpressed = !Ink.backpressed; 
+  else if (!Ink.scene.equals(Ink.swap[19])) {
+    Ink.scene = Ink.swap[19];
+  }
+  return;
+}
+
 
 public void mouseReleased() {
   rel = true;
@@ -118,7 +137,7 @@ public void mouseReleased() {
     if (mouseX >= 0 && mouseX <= 120*width/360 && mouseY >= 240*height/640 && mouseY <= 320*height/640 && k >= 1) k--;
     else if (mouseX >= 200*width/360 && mouseX <= 340*width/360 && mouseY >= 240*height/640 && mouseY <= 320*height/640 && k < colors.length-1) k++;
     if (mouseY >= 320*height/640 && mouseY <= 400*height/640) singleplayer = !singleplayer;
-    if (mouseY < 60*height/640 && mouseY > 0) scene = "Menu";
+    if (mouseY < 60*height/640 && mouseY > 0) scene = parola[19];
     if (rel && mouseY >= 450*height/640) {
       scene = "R-Play"; 
       creazioneGriglia(singleplayer);
@@ -143,22 +162,20 @@ public void keyReleased() {
 }
 public void menu() {
   background(0);
-  for (int i = 0; i < 3; i++) ellipse(70+(i*110), 35, 60, 60, colore(i+4));
+  //for (int i = 0; i < 3; i++) {     ellipse(70+(i*110), 35, 60, 60, colore(i+4));     image(cose[i], (70+(i*110))*width/360, 35*height/640, 60*width/360, 60*width/360);  }
   for (int i = 0; i < 4; i++) text(parola[i], 180, 125+(125*i), 30, colore(i), i);
 }
-int n=0, k=0, l=0; //Indici di array (n = griglia) (k = colori) (l = difficolta')
 public void setPlay() {
   background(0);
-  text("Menu", 180, 40, 30, colore(6), 6);
-  text("<  "+parola[5]+""+grid[n]+"  >", 180, 100, 30, colore(0), 0);
+  text(parola[19], 180, 40, 30, colore(6), 6); //Menu
+  text("<  "+parola[5]+""+grid[n]+"  >", 180, 100, 30, colore(0), 0); //Griglia
   //text(parola[4]+"\n"+diff[l], 180, 150, 25, colore(2), 2);
   //text("<  "+parola[4]+(l+1)+"  >", 180, 190, 25, colore(4), 4);
-  text("<  "+parola[6]+""+colors[k]+"  >", 180, 280, 30, colore(1), 1);
-  text(parola[0], 180, 525, 55, colore(2), 2); //Play
-  if (singleplayer) text("<  Singleplayer  >", 180, 370, 30, colore(3), 3);
-  else text("<  Multiplayer  >", 180, 370, 30, colore(3), 3);
+  text("<  "+parola[6]+""+colors[k]+"  >", 180, 280, 30, colore(4), 4); //Colore
+  text(parola[0], 180, 525, 55, colore(3), 3); //Play
+  text("<  "+parola[24+PApplet.parseInt(!singleplayer)]+"  >", 180, 370, 30, colore(1), 1);
   if (!singleplayer) {
-    if (n < 4) n = 4;
+    if (n < 4) n = 3;
     if (k < 2) k = 2;
   }
   //192.000 processori 86 core 17megawat
@@ -169,7 +186,7 @@ public void creazioneGriglia(boolean uno) {
   s = new Square[PApplet.parseInt(x[0])][PApplet.parseInt(x[1])];
   b = new Button[PApplet.parseInt(colors[k])];
   b2 = new Button[PApplet.parseInt(colors[k])]; //UOVA DI PASQUA PER TUTTI
-  size = int(sqrt((sq(s.length)+sq(int(colors[k])+1))));//PApplet.parseInt(mosse[k][2][n]); //HAHAHAHAH FANCULO SCIENZA
+  size = PApplet.parseInt(sqrt(sq(s.length)+sq(s[0].length)+sq(PApplet.parseInt(colors[k]))));//PApplet.parseInt(mosse[k][2][n]); //HAHAHAHAH FANCULO SCIENZA
   float d = 340/s.length;
   float dd;
   if (s.length == s[0].length) dd = d;
@@ -180,12 +197,12 @@ public void creazioneGriglia(boolean uno) {
         s[i][j] = new Square(i, j, 10+(d*i), 120+(dd*j), false, d);
     s[0][0].controller(true, 0);
     for (int i = 0; i < b.length; i++)
-      b[i] = new Button(5+(i*60*6/PApplet.parseInt(colors[k])), colore(i), i);
+      b[i] = new Button(5+(i*60*6/PApplet.parseInt(colors[k])), altrocolore(i), i);
   } else { //Multi player
     for (int i = 0; i < b.length; i++)
-      b[i] = new Button(5+(i*60*6/PApplet.parseInt(colors[k])), 500, colore(i), i, 0);
+      b[i] = new Button(5+(i*60*6/PApplet.parseInt(colors[k])), 500, altrocolore(i), i, 0);
     for (int i = 0; i < b2.length; i++)
-      b2[i] = new Button(5+(i*60*6/PApplet.parseInt(colors[k])), 15, colore(i), i, 1);
+      b2[i] = new Button(5+(i*60*6/PApplet.parseInt(colors[k])), 15, altrocolore(i), i, 1);
     for (int i =0; i< s.length; i++)
       for (int j = 0; j < s[0].length; j++) 
         s[i][j] = new Square(i, j, 10+(d*i), 120+(dd*j), false, d);
@@ -227,17 +244,17 @@ public void gioco_1() {
   for (int i = 0; i < b.length; i++)
     b[i].view();
 
-  if ((flag || nMosse == size) && cSQ == colore(lol)) //Attendo la fine dell'animazione per fare il gameover
+  if ((flag || nMosse == size) && cSQ == altrocolore(lol)) //Attendo la fine dell'animazione per fare il gameover
     gameover(flag);
   fill(255);
   if (nMosse <= size)
-    text("Left: "+str(size-nMosse), 280, 100, 30);
-  text("Record:"+record[n+(k*colors.length)], 80, 100, 30);
-  text("Menu", 180, 40, 30, colore(6), 6);
+    text(parola[18]+""+nMosse+"/"+size, 270, 100, 30);
+  text(parola[17]+record[n+k*(colors.length)+k], 80, 100, 30);
+  text(parola[19], 180, 40, 30, colore(6), 6);
 }
 
 
-void gioco_2() {
+public void gioco_2() {
   boolean flag = true;
   background(0);
   if (!end && animazione) {
@@ -275,33 +292,34 @@ void gioco_2() {
     lol = -1;
   }
   pushMatrix();
-  translate((180*int(!player1))*width/360, (470*int(!player1))*height/640);
+  translate((180*PApplet.parseInt(!player1))*width/360, (470*PApplet.parseInt(!player1))*height/640);
   textAlign(CENTER);
-  rotate(radians(180)*int(!player1));
+  rotate(radians(180)*PApplet.parseInt(!player1));
   fill(255);
   if (!end)
-    text("G1:"+(g1+1)+"/ G2:"+(g2+1), 180*int(player1), 100*int(player1), 30);//color(255));
+    text("G1:"+(g1+1)+"/ G2:"+(g2+1), 180*PApplet.parseInt(player1), 100*PApplet.parseInt(player1), 30);//color(255));
   popMatrix();
   pushMatrix();
-  translate(150*width/360, (30+(505*int(!player1)))*height/640);
+  translate(150*width/360, (30+(505*PApplet.parseInt(!player1)))*height/640);
   textAlign(CENTER);
-  rotate(radians(180)*int(!player1));
+  rotate(radians(180)*PApplet.parseInt(!player1));
   if (!end)
-    text("Player: "+(int(player1)+1)+" move's", 0, 0, 20);
+    text(parola[20]+(PApplet.parseInt(player1)+1), 0, 0, 20);
   popMatrix();
 }
-int gr = 0;
+
 public void score() {
   int cc = 0;
   background(0);
-  text("Menu", 180, 40, 30, colore(6), 6);
-  text("<  "+parola[6]+""+colors[gr]+"  >", 180, 110, 30, colore(1), 1);
+  text(parola[19], 180, 40, 30, colore(6), 6);
+  text("<  "+parola[6]+""+colors[gr]+"  >", 180, 110, 30, colore(4), 4);
   for (int i = 0; i < grid.length; i++) {
-    if (record[i+(gr)*colors.length].equals("/")) cc = 3; 
-    else if (str(record[i+(gr)*colors.length].charAt(record[i+(gr)*colors.length].length()-1)).equals("%")) cc = 2; 
-    else cc = 4;
-    text(grid[i]+": "+record[i+(gr)*colors.length], 180, 160+(45*i), 22, colore(cc), cc); //Metti un play
-    image(play, 320*width/360, (152.5+(45*i))*height/640, 35*width/360, 35*width/360);
+    int ind = i+gr*(colors.length)+gr;
+    if (record[ind].equals("/")) cc = 1; 
+    else if (str(record[ind].charAt(record[ind].length()-1)).equals("%")) cc = 3; 
+    else cc = 2;
+    text(grid[i]+": "+record[ind], 180, 160+(45*i), 22, colore(cc), cc); //Metti un play
+    image(play, 320*width/360, (152.5f+(45*i))*height/640, 35*width/360, 35*width/360);
   }
 }
 
@@ -331,14 +349,14 @@ public void reset(boolean replay) {
   imhere = true;
 }
 
-void separa() {
+public void separa() {
   int i = RI(b.length-2);
   cSQ = s[0][0].c = colore(i);
   cSQ1 = s[s.length-1][s[0].length-1].c = colore(i+1);
 }
-int g1 =0, g2=0;
 public void gameover(boolean win) {
-  int easy = n+(k)*colors.length;
+  int easy = n+k*(colors.length)+k;
+  //println(easy);
   String ve;
   if (!end) { 
     for (int i = 0; i < s.length; i++) for (int j = 0; j < s[0].length; j++)  
@@ -356,36 +374,35 @@ public void gameover(boolean win) {
         else
           ve = str(record[easy].charAt(0));
 
-        if (nQuad*(100)/(s.length*s[0].length) > int(ve))
-          record[easy] = str(int(nQuad*(100)/(s.length*s[0].length)))+"%";
+        if (nQuad*(100)/(s.length*s[0].length) > PApplet.parseInt(ve))
+          record[easy] = str(PApplet.parseInt(nQuad*(100)/(s.length*s[0].length)))+"%";
       } else if (win && (str(record[easy].charAt(record[easy].length()-1)).equals("%") || record[easy].equals("/"))) {
         record[easy] = str(nMosse);
       } else if (win && !str(record[easy].charAt(record[easy].length()-1)).equals("%") && !record[easy].equals("/")) {
-        if (nMosse < int(record[easy]))
+        if (nMosse < PApplet.parseInt(record[easy]))
           record[easy] = str(nMosse);
       }
-      salvataggio();
+      salvataggio("savedata.txt", record);
     }
-    //  salva = append(salva, "Numero mosse:"+str(nMosse)+" Girglia: "+ grid[n]+ " Difficoltà: "+diff[l]);
   }
   end = true;
   for (int i = 0; i < 6; i++) //Stampo i quadrati del gameover
     if ((i <= 2 || singleplayer) && (i != 3 || (n > 0 || k > 0)) && (i != 5 || (n != grid.length-1 || k != colors.length))) {
-      rect(30+(i%3*100), 400-(100*(int(i>2))), 80, 60, color(255));
+      rect(30+(i%3*100), 400-(100*(PApplet.parseInt(i>2))), 80, 60, color(255)); //SPAGHETTICODE
       fill(0);
-      text(parola[10+i], (i%3*100)+68, 430-(int(i>2)*100), 17);
+      text(parola[10+i], (i%3*100)+68, 430-(PApplet.parseInt(i>2)*100), 17);
     }
   if (cSQ == color(0)) fill(255);
   else fill(0);
-  if (!win)  text("Game over \n"+(nQuad*(100))/(s.length*s[0].length)+"% "+parola[7], 180, 160, 35);
-  else if (win && singleplayer)text(parola[8]+" \n 100% "+parola[7]+"\n in "+nMosse+" "+parola[9], 180, 160, 35);
-  else  text("Player1 :"+g1+"\nPlayer2 :"+g2, 180, 180, 35);
+  if (!win)  text(parola[23]+"\n"+(nQuad*(100))/(s.length*s[0].length)+"% "+parola[7], 180, 160, 35);
+  else if (win && singleplayer)text(parola[8]+" \n 100% "+parola[7]+"\n"+nMosse+" "+parola[9], 180, 160, 35);
+  else  text(parola[21]+g1+"\n"+parola[22]+g2, 180, 180, 35);
 
   if (mouseX >= 230*width/360 && mouseY >= 400*height/640 && mouseX <= 310*width/360 && mouseY <= 460*height/640 && end && rel) {
     reset(false);
   } else if (mouseX >= 130*width/360 && mouseY >= 400*height/640 && mouseX <= 210*width/360 && mouseY <= 460*height/640 && end && rel) {
     reset(false);
-    scene = "Menu";
+    scene = parola[19];
     mouseY = 20000;
   } else if (mouseX >= 130*width/360 && mouseY >= 300*height/640 && mouseX <= 210*width/360 && mouseY <= 360*height/640 && end && rel && singleplayer) {
     reset(true);
@@ -406,6 +423,11 @@ public void gameover(boolean win) {
     }
     creazioneGriglia(true);
     reset(false);
+  } else if (mouseX >= 30*width/360 && mouseY >= 400*height/640 && mouseX <= 210*width/360 && mouseY <= 460*height/640 && end && rel) {
+    k = RI(colors.length); 
+    n = RI(grid.length);
+    creazioneGriglia(true);
+    reset(false);
   }
 }
 
@@ -420,13 +442,16 @@ public void pause() {
   if (mouseX >= 230*width/360 && mouseY >= 400*height/640 && mouseX <= 310*width/360 && mouseY <= 460*height/640 &&  rel) {
     reset(false);
     scene = "R-Play";
+    backpressed = false;
   } else if (mouseX >= 130*width/360 && mouseY >= 400*height/640 && mouseX <= 210*width/360 && mouseY <= 460*height/640 && rel) {
     reset(false);
-    scene = "Menu";
+    scene = parola[19];
     mouseY = -20;
+    backpressed = false;
   } else if (mouseX >= 30*width/360 && mouseY >= 400*height/640 && mouseX <= 110*width/360 && mouseY <= 460*height/640 && rel) {
     scene = "R-Play";
     mouseY = -20;
+    backpressed = false;
   }
 }
 public int RI(float x) {
@@ -434,25 +459,36 @@ public int RI(float x) {
 }
 
 public int colore(int r) {
-  if( r >= 0){
-  String[] x = split(fill[r], ',');
-  return color(PApplet.parseInt(x[0]), PApplet.parseInt(x[1]), PApplet.parseInt(x[2]));
+  if ( r >= 0) {
+    String[] x = split(fill[r], ',');
+    return color(PApplet.parseInt(x[0]), PApplet.parseInt(x[1]), PApplet.parseInt(x[2]));
+  }
+  return 0;
+}
+
+public int altrocolore(int r) {
+  if ( r >= 0) {
+    String[] x = split(col[r], ',');
+    return color(PApplet.parseInt(x[0]), PApplet.parseInt(x[1]), PApplet.parseInt(x[2]));
   }
   return 0;
 }
 
 public void cambiaColore(int x) {
-  for (int i = 0; i < fill.length; i++) {
-    String[] y = split(fill[i], ',');
+  for (int i = 0; i < col.length; i++) {
+    String[] y = split(col[i], ',');
     int A=PApplet.parseInt(y[0]), B=PApplet.parseInt(y[1]), C=PApplet.parseInt(y[2]);
     if (x == color(A, B, C)) {
-      if (f1 <= A) f1+= (A/17)*60/frameRate;
+      if (f1 < A) f1+= (A/17)*60/frameRate;
+      else if (f1 > A) f1-= (max(A, max(B, C))/17)*60/frameRate;
       else f1 = A;
 
-      if (f2 < B) f2+= (B/17)*60/frameRate; 
+      if (f2 < B) f2+= (B/17)*60/frameRate;
+      else if ( f2 > B) f2-= (max(A, max(B, C))/17)*60/frameRate;
       else f2 = B;
 
       if (f3 < C) f3+= (C/17)*60/frameRate; 
+      else if ( f3 > C) f3-= (max(A, max(B, C))/17)*60/frameRate;
       else f3 = C;
     }
     if (player1||singleplayer) {
@@ -467,53 +503,53 @@ public void cambiaColore(int x) {
   } else con = false;
 }
 
-int nk = 0;
-boolean cont;
+
 public void movimentoRec(float y, float lx, float ts, int l) {
   tint(colore(l));
-  image(rec[0], 0, (y-ts/2.5)*height/640, lx*width/360, ts*2*width/360);
-  image(rec[1], (360)*width/360, (y-ts/2.5)*height/640, lx*width/360, ts*2*width/360);
+  image(rec[0], 0, (y-ts/2.5f)*height/640, lx*width/360, ts*2*width/360);
+  image(rec[1], (360)*width/360, (y-ts/2.5f)*height/640, lx*width/360, ts*2*width/360);
   if (lx >= 180)
     fill(0);
   if (!cont) { 
-    sY = y-ts*1.5; 
+    sY = y-ts*1.5f; 
     tS = ts;
   }
 }
 
 public void text(String a, float x, float y, float ts) {
-  textSize(ts*width/360);
+  //textSize(ts*width/360);
+  textFont(font, ts*width/360);
   text(a, x*width/360, y*height/640);
 }
-float sY;
 public void text(String a, float x, float y, float ts, int fil, int i) {
   fill(fil);
-  if (mouseY >= (y-ts*1.5)*height/640 && mouseY <= (y+ts/2)*height/640) { 
+  if (mouseY >= (y-ts*1.5f)*height/640 && mouseY <= (y+ts/2)*height/640) { 
     movimentoRec(y, nk+=60*60/frameRate, ts, i);
     tint(0);
     cont = true;
-    if (rel && (scene.equals("Menu") || a.equals("Menu"))) {
+    if (rel && (scene.equals(parola[19]) || a.equals(parola[19]))) {
       scene = a;
-      if (a.equals("Menu") && s != null) reset(false);
-    } else if (scene.equals(parola[2]) && rel && i >= 2 && i <= 4 && mouseX >= 300*width/360) {
+      if (a.equals(parola[19]) && s != null) reset(false);
+    } else if (scene.equals(parola[2]) && rel && i >= 1 && i <= 3 && mouseX >= 300*width/360) {
       //(152.5+(45*i))*height/640, 35*width/360, 35*width/360)
       scene = parola[0];
       singleplayer = true;
       k = gr;
-      n = int((y-152.5)/45);
+      n = PApplet.parseInt((y-152.5f)/45);
     }
   } else tint(fil);
 
-  textSize((ts)*width/360);
+  textFont(font, ts*width/360);
+  //textSize((ts)*width/360);
   text(a, x*width/360, y*height/640);
 }
 
-public void rect(float x, float y, float x2, float y2, color co) {
+public void rect(float x, float y, float x2, float y2, int co) {
   fill(co);
   rect(x*width/360, y*height/640, x2*width/360, y2*height/640);
 }
 
-public void ellipse(float x, float y, float dim, float dim2, color c) {
+public void ellipse(float x, float y, float dim, float dim2, int c) {
   fill(c);
   ellipse(x*width/360, y*height/640, dim*width/360, dim2*width/360);
 }

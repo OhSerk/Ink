@@ -8,10 +8,22 @@ Colors:
 Complete
 You win!
 moves!
-Share
+Random
 Menu
 New
-Prec.
+Prev.
 Retry
-Succ.
+Next
 Resume
+Record:
+Moves:
+Menu
+Player
+Player1:
+Player2:
+You lose!
+Singleplayer
+Multiplayer
+Animation
+Language
+English

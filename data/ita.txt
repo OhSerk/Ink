@@ -8,10 +8,22 @@ Colori:
 Completato
 Hai vinto!
 mosse!
-Condividi
+Casuale
 Menù
 Nuovo
 Prec.
 Riprova
 Succ.
 Riprendi
+Record:
+Mosse:
+Menu
+Giocatore 
+Giocatore1:
+Giocatore2:
+Hai perso!
+Giocatore singolo
+Multigiocatore
+Animazione
+Lingua
+Italiano
