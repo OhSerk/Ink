@@ -3,10 +3,10 @@ Square[][] s;
 Button[] b, b2;
 protected boolean con = false, imhere = true, rel = false, kel = false, scambio = false, delay = true;
 int size, rx, ry, cSQ = color(0), cSQ1, nMosse = 0, nQuad = 0, Col, nCol, f1, f2, f3;
-PImage rec[] = new PImage[2], play, logo, cose[] = new PImage[3];
+PImage rec[], play, logo;
 static String scene = "Menu", cambia="", swap[];
 static boolean end = false, animazione = true, singleplayer =true, player1 = true, local = true, backpressed = false;
-String parola[], grid[], colors[], fill[], diff[], mosse[][][], salva[], record[], col[];
+String parola[], grid[], colors[], fill[], diff[], record[], col[], visual[];
 static int lol = 0; //Uso in button
 //Variabili per l'animazione del rettangolo
 int nk = 0; 
@@ -17,16 +17,16 @@ PFont font;
 public void settings() {
   orientation(PORTRAIT);
   size(PApplet.parseInt(displayHeight*0.5625f), displayHeight, P2D);
+  //fullScreen(P2D);
 }
 
 public void setup() {
-  println(displayWidth, displayHeight);
-  println(System.getProperty("os.name"));
+  // println(displayWidth, displayHeight);
+  //println(System.getProperty("os.name"));
+  rec = new PImage[2];
   font = createFont("0.ttf", 30*width/360);
   rec[0] = loadImage("0.png");
   rec[1] = loadImage("1.png");
-  //cose[0] = cose[2] = loadImage("dito.png");
-  //cose[1] = loadImage("droga.png");
   play = loadImage("play.png");
   logo = loadImage("logo.png");
   parola = swap = loadStrings("ita.txt");
@@ -42,11 +42,6 @@ public void setup() {
     record = loadStrings("vuoto.txt");
     salvataggio("savedata.txt", record);
   }
-  /*  mosse = new String[colors.length][diff.length][grid.length];
-   for (int i = 0; i < mosse.length; i++) 
-   for (int j =0; j < diff.length; j++) 
-   mosse[i][j] = loadStrings(3+i+"-"+j+"col.txt");
-   */
   scene = parola[19];
   noStroke();
   textAlign(CENTER);
@@ -56,6 +51,7 @@ public void setup() {
 }
 
 public void draw() {
+  println(frameRate);
   if ((mouseY > (sY+(tS*2))*height/640 || mouseY < sY*height/640)) {
     nk = 0;  
     cont = false;
@@ -86,10 +82,10 @@ public void draw() {
   } else if (scene.equals("x")) {
     cambialingua();
   } 
-  if (backpressed && scene.equals("R-Play")) pause();
+  if (backpressed && scene.equals("R-Play")) Ink_pause();
   rel = kel = false;
-  rect(0, 550, 360, 90, color(255));
-  text("Questo e' un banner", 180, 590, 20, color(0), 7);
+  //rect(0, 550, 360, 90, color(255));
+  //text("Questo e' un banner", 180, 590, 20, color(0), 7);
 }
 
 public void salvataggio(String s, String[] save) {
@@ -141,6 +137,7 @@ public void mouseReleased() {
     if (rel && mouseY >= 450*height/640) {
       scene = "R-Play"; 
       creazioneGriglia(singleplayer);
+      player1 = boolean(RI(2));
     }
   } else if ( scene.equals(parola[2])) {
     if (mouseX >= 0 && mouseX <= 120*width/360 && mouseY >= 70*height/640 && mouseY <= 120*height/640 && gr >= 1) gr--;
@@ -212,12 +209,13 @@ public void creazioneGriglia(boolean uno) {
   }
   Col = nCol = cSQ = s[rx][ry].c;
   nMosse = nQuad = 0;
+  visual = split(record[k], "_");
 }
 
 public void gioco_1() {
   boolean flag = true;
   background(0);
-  //noStroke();
+
   if (!end && animazione) {
     if (!con || nMosse > 0)
       cambiaColore(Col);
@@ -249,10 +247,13 @@ public void gioco_1() {
   fill(255);
   if (nMosse <= size)
     text(parola[18]+""+nMosse+"/"+size, 270, 100, 30);
-  text(parola[17]+record[n+k*(colors.length)+k], 80, 100, 30);
+  text(parola[17]+visual[n], 80, 100, 30);
   text(parola[19], 180, 40, 30, colore(6), 6);
+  // stroke(255);
+  // noFill();
+  // rect(10*width/360,120*height/640,b_x*width/360,b_y*width/360);
 }
-
+float b_x, b_y;
 
 public void gioco_2() {
   boolean flag = true;
@@ -310,15 +311,16 @@ public void gioco_2() {
 
 public void score() {
   int cc = 0;
+  String view[] = split(record[gr], "_");
   background(0);
   text(parola[19], 180, 40, 30, colore(6), 6);
   text("<  "+parola[6]+""+colors[gr]+"  >", 180, 110, 30, colore(4), 4);
   for (int i = 0; i < grid.length; i++) {
-    int ind = i+gr*(colors.length)+gr;
-    if (record[ind].equals("/")) cc = 1; 
-    else if (str(record[ind].charAt(record[ind].length()-1)).equals("%")) cc = 3; 
+    int ind = i+gr*(grid.length);
+    if (view[i].equals("/")) cc = 1; 
+    else if (str(view[i].charAt(view[i].length()-1)).equals("%")) cc = 3; 
     else cc = 2;
-    text(grid[i]+": "+record[ind], 180, 160+(45*i), 22, colore(cc), cc); //Metti un play
+    text(grid[i]+": "+view[i], 180, 160+(45*i), 22, colore(cc), cc); //Metti un play
     image(play, 320*width/360, (152.5f+(45*i))*height/640, 35*width/360, 35*width/360);
   }
 }
@@ -355,7 +357,8 @@ public void separa() {
   cSQ1 = s[s.length-1][s[0].length-1].c = colore(i+1);
 }
 public void gameover(boolean win) {
-  int easy = n+k*(colors.length)+k;
+  //int easy = n+k*(grid.length);
+  String view[] = split(record[k], "_");
   //println(easy);
   String ve;
   if (!end) { 
@@ -365,23 +368,28 @@ public void gameover(boolean win) {
         else if (s[i][j].giocatore == 0) g2++; 
         nQuad++;
       }
-    // score = append(score, str(score.length+1)+"  :"+str((nQuad*(100))/(s.length*s[0].length))+"% Complete");
     if (singleplayer) {
-      if (!win && (str(record[easy].charAt(record[easy].length()-1)).equals("%") || record[easy].equals("/"))) { 
+      if (!win && (str(view[n].charAt(view[n].length()-1)).equals("%") || view[n].equals("/"))) { 
         //Se hai perso, e il record finisce con una percentuale o non esiste
-        if (record[easy].length() > 2)
-          ve = str(record[easy].charAt(0))+""+str(record[easy].charAt(1));
+        if (view[n].length() > 2)
+          ve = str(view[n].charAt(0))+""+str(view[n].charAt(1));
         else
-          ve = str(record[easy].charAt(0));
+          ve = str(view[n].charAt(0));
 
         if (nQuad*(100)/(s.length*s[0].length) > PApplet.parseInt(ve))
-          record[easy] = str(PApplet.parseInt(nQuad*(100)/(s.length*s[0].length)))+"%";
-      } else if (win && (str(record[easy].charAt(record[easy].length()-1)).equals("%") || record[easy].equals("/"))) {
-        record[easy] = str(nMosse);
-      } else if (win && !str(record[easy].charAt(record[easy].length()-1)).equals("%") && !record[easy].equals("/")) {
-        if (nMosse < PApplet.parseInt(record[easy]))
-          record[easy] = str(nMosse);
+          view[n] = str(PApplet.parseInt(nQuad*(100)/(s.length*s[0].length)))+"%";
+      } else if (win && (str(view[n].charAt(view[n].length()-1)).equals("%") || view[n].equals("/"))) {
+        view[n] = str(nMosse);
+      } else if (win && !str(view[n].charAt(view[n].length()-1)).equals("%") && !view[n].equals("/")) {
+        if (nMosse < PApplet.parseInt(view[n]))
+          view[n] = str(nMosse);
       }
+      String deb = "";
+      for(int i = 0; i < view.length; i++){
+        deb += view[i];
+        if(i != view.length-1) deb += "_";
+      }
+      record[k] = deb;
       salvataggio("savedata.txt", record);
     }
   }
@@ -431,7 +439,7 @@ public void gameover(boolean win) {
   }
 }
 
-public void pause() {  
+public void Ink_pause() {  
   rect(30, 400, 80, 60, color(255));
   rect(130, 400, 80, 60, color(255));
   rect(230, 400, 80, 60, color(255));
@@ -481,14 +489,17 @@ public void cambiaColore(int x) {
     if (x == color(A, B, C)) {
       if (f1 < A) f1+= (A/17)*60/frameRate;
       else if (f1 > A) f1-= (max(A, max(B, C))/17)*60/frameRate;
+      else if (f1 <= A+(A/17)*60/frameRate && f1 >= A-(A/17)*60/frameRate) f1 = A;
       else f1 = A;
 
       if (f2 < B) f2+= (B/17)*60/frameRate;
       else if ( f2 > B) f2-= (max(A, max(B, C))/17)*60/frameRate;
+      else if (f2 <= B+(B/17)*60/frameRate && f2 >= B-(B/17)*60/frameRate) f2 = B;
       else f2 = B;
 
       if (f3 < C) f3+= (C/17)*60/frameRate; 
       else if ( f3 > C) f3-= (max(A, max(B, C))/17)*60/frameRate;
+      else if (f3 <= C+(C/17)*60/frameRate && f3 >= C-(C/17)*60/frameRate) f3 = C;
       else f3 = C;
     }
     if (player1||singleplayer) {
@@ -545,11 +556,12 @@ public void text(String a, float x, float y, float ts, int fil, int i) {
 }
 
 public void rect(float x, float y, float x2, float y2, int co) {
-  fill(co);
+  fill(co); 
   rect(x*width/360, y*height/640, x2*width/360, y2*height/640);
 }
 
 public void ellipse(float x, float y, float dim, float dim2, int c) {
-  fill(c);
+  if (c <= 0)fill(c); 
+  else noFill();
   ellipse(x*width/360, y*height/640, dim*width/360, dim2*width/360);
 }

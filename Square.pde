@@ -22,9 +22,9 @@ public class Square {
       C = c;
     } else
       C = realC;
-    //noStroke();    
+    noStroke();    
     rect(px, py, dim, dim, color(C));
-
+    
     /* if (giocatore == 0) {
      fill(color(0));
      text("x", px+dim/2, py+dim/2, 10);
@@ -37,7 +37,6 @@ public class Square {
      }
      }*/
   }
-
   public int colore() {
     String[] x = split(col[RI(b.length)], ',');
     return color(PApplet.parseInt(x[0]), PApplet.parseInt(x[1]), PApplet.parseInt(x[2]));

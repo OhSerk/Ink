@@ -19,10 +19,11 @@ public class Button {
     dim = 35;
   }
   public void view() {
-    rect(px, py, 50*6/PApplet.parseInt(colors[k]), dim, color(c));
+    stroke(255);
+    rect(px, py, 50*6/PApplet.parseInt(colors[k]), 50*6/PApplet.parseInt(colors[k]), color(c));
     fill(0);
    // text(str(i), px+25*6/PApplet.parseInt(colors[k]), py+dim/2, 20);
-    if (((mouseX >= px*width/360 && mouseX <= (px+(50*6/PApplet.parseInt(colors[k])))*width/360 && mouseY >= py*height/640 && mouseY <= (py+dim)*height/640 && rel) || (str(key).equals(str(i)) && kel)) 
+    if (((mouseX >= px*width/360 && mouseX <= (px+(50*6/PApplet.parseInt(colors[k])))*width/360 && mouseY >= py*height/640 && mouseY <= (py+(50*6/PApplet.parseInt(colors[k])))*height/640 && rel) || (str(key).equals(str(i)) && kel)) 
       && !end && scene.equals("R-Play") && (con || !animazione)) { //Se clicci sul bottone, il gioco non è finito, stai giocando e è finita l'animazione oppure non c'è allora fai..
       //println("x");
       for (int j = 0; j < s[0].length; j++)
