@@ -5,7 +5,7 @@ import android.widget.RelativeLayout;
 import com.google.ads.*;
 
 @Override
-  public void onCreate(Bundle savedInstanceState) {
+public void onCreate(Bundle savedInstanceState) {
   super.onCreate(savedInstanceState);
   Window window = getWindow();
   RelativeLayout adsLayout = new RelativeLayout(this);
@@ -21,19 +21,19 @@ import com.google.ads.*;
 }
 
 @Override
-  public void onPause() {
-  super.onPause();
-}
-@Override
-  public void onStop() {
-  super.onStop();
-}
-@Override
-  public void onDestroy() {
-  super.onDestroy();
-}
-@Override
-  public void onResume() {
-  super.onResume();
-}
-*/
+ public void onPause() {
+ super.onPause();
+ }
+ @Override
+ public void onStop() {
+ super.onStop();
+ }
+ @Override
+ public void onDestroy() {
+ super.onDestroy();
+ }
+ @Override
+ public void onResume() {
+ super.onResume();
+ }
+ */

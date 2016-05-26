@@ -4,9 +4,9 @@ Button[] b, b2;
 protected boolean con = false, imhere = true, rel = false, kel = false, scambio = false, delay = true;
 int size, rx, ry, cSQ = color(0), cSQ1, nMosse = 0, nQuad = 0, Col, nCol, f1, f2, f3;
 PImage rec[], play, logo;
-static String scene = "Menu", cambia="", swap[];
-static boolean end = false, animazione = true, singleplayer =true, player1 = true, local = true, backpressed = false;
-String parola[], grid[], colors[], fill[], diff[], record[], col[], visual[];
+static String scene = "", cambia="", swap[];
+static boolean end = false, animazione = true, singleplayer =true, player1 = true, local = true, backpressed = false, nondevi = true;
+String parola[], grid[], colors[], fill[], diff[], record[], col[], visual[], datiutili[];
 static int lol = 0; //Uso in button
 //Variabili per l'animazione del rettangolo
 int nk = 0; 
@@ -25,11 +25,11 @@ public void setup() {
   //println(System.getProperty("os.name"));
   rec = new PImage[2];
   font = createFont("0.ttf", 30*width/360);
+  textFont(font);
   rec[0] = loadImage("0.png");
   rec[1] = loadImage("1.png");
   play = loadImage("play.png");
   logo = loadImage("logo.png");
-  parola = swap = loadStrings("ita.txt");
   grid = loadStrings("griglia.txt");
   colors = loadStrings("colors.txt");
   fill = loadStrings("fill.txt");
@@ -42,22 +42,36 @@ public void setup() {
     record = loadStrings("vuoto.txt");
     salvataggio("savedata.txt", record);
   }
+  File k = new File(dataPath("datiutili.txt"));
+  if (k.exists()) {
+    println("porcodio");
+    datiutili = loadStrings(dataPath("datiutili.txt"));
+    parola = swap = loadStrings(datiutili[0]+".txt");
+    animazione = boolean(datiutili[1]);
+  } else {
+    datiutili = new String[2];
+    datiutili[0] = datiutili[1] = "";
+    parola = swap = loadStrings("Italiano.txt");
+  }
   scene = parola[19];
   noStroke();
   textAlign(CENTER);
   imageMode(CENTER);
   scene = "logo";
   background(255);
+  mouseY = height/10;
 }
 
 public void draw() {
-  println(frameRate);
+  //println(frameRate);
   if ((mouseY > (sY+(tS*2))*height/640 || mouseY < sY*height/640)) {
     nk = 0;  
     cont = false;
   }
   if (scene.equals("logo")) {
-    if (frameCount > 200) scene = parola[19];
+    nondevi = true;
+    if (frameCount > 200 && !datiutili[0].equals("")) scene = parola[19];
+    else if (frameCount > 200 && datiutili[0].equals("")) scene = "Linguaggiamelo";
     noTint();
     image(logo, 180*width/360, 320*height/640, 180*width/360, 180*width/360);
   } else if (scene.equals(parola[19])) {
@@ -79,11 +93,16 @@ public void draw() {
     background(0);
     text("Serk", 180, 320, 40, colore(6), 6);
     text(parola[19], 180, 40, 30, colore(6), 6);
+  } else if (scene.equals("Linguaggiamelo")) {
+    background(0);
+    text(parola[19], 180, 40, 30, colore(6), 6);
+    text("< "+parola[27]+": "+parola[28]+" >", 180, 220, 30, colore(0), 0);
+    if (rel && mouseY >= 180*height/640 && mouseY <= 260*height/640) scene = "x";
   } else if (scene.equals("x")) {
     cambialingua();
-  } 
+  }
   if (backpressed && scene.equals("R-Play")) Ink_pause();
-  rel = kel = false;
+  rel = kel = nondevi = false;
   //rect(0, 550, 360, 90, color(255));
   //text("Questo e' un banner", 180, 590, 20, color(0), 7);
 }
@@ -106,16 +125,19 @@ public void options() {
 }
 
 public void cambialingua() {
-  if (parola[28].equals("English")) cambia = "ita";
-  else if (parola[28].equals("Italiano")) cambia = "eng";
+  if (parola[28].equals("English")) cambia = "Italiano";
+  else if (parola[28].equals("Italiano")) cambia = "English";
   parola = loadStrings(cambia+".txt");
-  scene = parola[1];
-  swap = parola;
+  if (!datiutili[0].equals("")) {
+    scene = parola[1];
+    swap = parola;
+  } else scene = "Linguaggiamelo";
 }  
 
 public void onBackPressed() {
   if (Ink.scene.equals("R-Play") && Ink.singleplayer)
     Ink.backpressed = !Ink.backpressed; 
+  else if (nondevi);
   else if (!Ink.scene.equals(Ink.swap[19])) {
     Ink.scene = Ink.swap[19];
   }
@@ -209,10 +231,10 @@ public void creazioneGriglia(boolean uno) {
   }
   Col = nCol = cSQ = s[rx][ry].c;
   nMosse = nQuad = 0;
-  visual = split(record[k], "_");
 }
 
 public void gioco_1() {
+  visual = split(record[k], "_");
   boolean flag = true;
   background(0);
 
@@ -385,9 +407,9 @@ public void gameover(boolean win) {
           view[n] = str(nMosse);
       }
       String deb = "";
-      for(int i = 0; i < view.length; i++){
+      for (int i = 0; i < view.length; i++) {
         deb += view[i];
-        if(i != view.length-1) deb += "_";
+        if (i != view.length-1) deb += "_";
       }
       record[k] = deb;
       salvataggio("savedata.txt", record);
@@ -487,20 +509,23 @@ public void cambiaColore(int x) {
     String[] y = split(col[i], ',');
     int A=PApplet.parseInt(y[0]), B=PApplet.parseInt(y[1]), C=PApplet.parseInt(y[2]);
     if (x == color(A, B, C)) {
-      if (f1 < A) f1+= (A/17)*60/frameRate;
-      else if (f1 > A) f1-= (max(A, max(B, C))/17)*60/frameRate;
-      else if (f1 <= A+(A/17)*60/frameRate && f1 >= A-(A/17)*60/frameRate) f1 = A;
-      else f1 = A;
+      //if (f1 < A) f1+= (A/17)*60/frameRate;
+      //else if (f1 > A) f1-= (max(A, max(B, C))/17)*60/frameRate;
+      //else if (f1 <= A+(A/17)*60/frameRate && f1 >= A-(A/17)*60/frameRate) f1 = A;
+      //else f1 = A;
 
-      if (f2 < B) f2+= (B/17)*60/frameRate;
-      else if ( f2 > B) f2-= (max(A, max(B, C))/17)*60/frameRate;
-      else if (f2 <= B+(B/17)*60/frameRate && f2 >= B-(B/17)*60/frameRate) f2 = B;
-      else f2 = B;
+      //if (f2 < B) f2+= (B/17)*60/frameRate;
+      //else if ( f2 > B) f2-= (max(A, max(B, C))/17)*60/frameRate;
+      //else if (f2 <= B+(B/17)*60/frameRate && f2 >= B-(B/17)*60/frameRate) f2 = B;
+      //else f2 = B;
 
-      if (f3 < C) f3+= (C/17)*60/frameRate; 
-      else if ( f3 > C) f3-= (max(A, max(B, C))/17)*60/frameRate;
-      else if (f3 <= C+(C/17)*60/frameRate && f3 >= C-(C/17)*60/frameRate) f3 = C;
-      else f3 = C;
+      //if (f3 < C) f3+= (C/17)*60/frameRate; 
+      //else if ( f3 > C) f3-= (max(A, max(B, C))/17)*60/frameRate;
+      //else if (f3 <= C+(C/17)*60/frameRate && f3 >= C-(C/17)*60/frameRate) f3 = C;
+      //else f3 = C;
+      f1 = int(CambiaF(A, B, C, f1, A));
+      f2 = int(CambiaF(A, B, C, f2, B));
+      f3 = int(CambiaF(A, B, C, f3, C));
     }
     if (player1||singleplayer) {
       cSQ = color(f1, f2, f3);
@@ -514,6 +539,12 @@ public void cambiaColore(int x) {
   } else con = false;
 }
 
+private float CambiaF(int A, int B, int C, int F, int X) {
+  if (F < X) return F+(X/17)*60/frameRate; 
+  else if ( F > X) return F-(max(A, max(B, C))/17)*60/frameRate;
+  else if (F >= X+(X/17)*60/frameRate || F <= X-(X/17)*60/frameRate) return X;
+  else return X;
+}
 
 public void movimentoRec(float y, float lx, float ts, int l) {
   tint(colore(l));
@@ -529,7 +560,7 @@ public void movimentoRec(float y, float lx, float ts, int l) {
 
 public void text(String a, float x, float y, float ts) {
   //textSize(ts*width/360);
-  textFont(font, ts*width/360);
+  textSize(ts*width/360);
   text(a, x*width/360, y*height/640);
 }
 public void text(String a, float x, float y, float ts, int fil, int i) {
@@ -539,6 +570,13 @@ public void text(String a, float x, float y, float ts, int fil, int i) {
     tint(0);
     cont = true;
     if (rel && (scene.equals(parola[19]) || a.equals(parola[19]))) {
+      if (rel && (scene.equals(parola[1]) || scene.equals("Linguaggiamelo"))) {
+        println("Sto salvando!");
+        datiutili[0] = parola[28];
+        datiutili[1] = str(animazione);
+        salvataggio("datiutili.txt", datiutili);
+        println("Ho finito di salvare, pezzo di merda!");
+      }
       scene = a;
       if (a.equals(parola[19]) && s != null) reset(false);
     } else if (scene.equals(parola[2]) && rel && i >= 1 && i <= 3 && mouseX >= 300*width/360) {
@@ -550,8 +588,8 @@ public void text(String a, float x, float y, float ts, int fil, int i) {
     }
   } else tint(fil);
 
-  textFont(font, ts*width/360);
-  //textSize((ts)*width/360);
+  //textFont(font, ts*width/360);
+  textSize(ts*width/360);
   text(a, x*width/360, y*height/640);
 }
 
