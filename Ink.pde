@@ -64,7 +64,7 @@ public void setup() {
 
 public void draw() {
   //println(frameRate);
-  if ((mouseY > (sY+(tS*2))*height/640 || mouseY < sY*height/640)) {
+  if ((mouseY > (sY+(tS*2))*height/640 || mouseY < sY*height/640) || rel) {
     nk = 0;  
     cont = false;
   }
@@ -159,7 +159,7 @@ public void mouseReleased() {
     if (rel && mouseY >= 450*height/640) {
       scene = "R-Play"; 
       creazioneGriglia(singleplayer);
-      player1 = boolean(RI(2));
+      player1 = true;
     }
   } else if ( scene.equals(parola[2])) {
     if (mouseX >= 0 && mouseX <= 120*width/360 && mouseY >= 70*height/640 && mouseY <= 120*height/640 && gr >= 1) gr--;
@@ -238,7 +238,7 @@ public void gioco_1() {
   boolean flag = true;
   background(0);
 
-  if (!end && animazione) {
+  if (!end) {
     if (!con || nMosse > 0)
       cambiaColore(Col);
     if (imhere) {
@@ -280,7 +280,7 @@ float b_x, b_y;
 public void gioco_2() {
   boolean flag = true;
   background(0);
-  if (!end && animazione) {
+  if (!end) {
     if (!con || nMosse > 0 && delay)
       cambiaColore(Col);
   }
@@ -323,7 +323,7 @@ public void gioco_2() {
     text("G1:"+(g1+1)+"/ G2:"+(g2+1), 180*PApplet.parseInt(player1), 100*PApplet.parseInt(player1), 30);//color(255));
   popMatrix();
   pushMatrix();
-  translate(150*width/360, (30+(505*PApplet.parseInt(!player1)))*height/640);
+  translate(180*width/360, (40+(495*PApplet.parseInt(!player1)))*height/640);
   textAlign(CENTER);
   rotate(radians(180)*PApplet.parseInt(!player1));
   if (!end)
@@ -509,20 +509,6 @@ public void cambiaColore(int x) {
     String[] y = split(col[i], ',');
     int A=PApplet.parseInt(y[0]), B=PApplet.parseInt(y[1]), C=PApplet.parseInt(y[2]);
     if (x == color(A, B, C)) {
-      //if (f1 < A) f1+= (A/17)*60/frameRate;
-      //else if (f1 > A) f1-= (max(A, max(B, C))/17)*60/frameRate;
-      //else if (f1 <= A+(A/17)*60/frameRate && f1 >= A-(A/17)*60/frameRate) f1 = A;
-      //else f1 = A;
-
-      //if (f2 < B) f2+= (B/17)*60/frameRate;
-      //else if ( f2 > B) f2-= (max(A, max(B, C))/17)*60/frameRate;
-      //else if (f2 <= B+(B/17)*60/frameRate && f2 >= B-(B/17)*60/frameRate) f2 = B;
-      //else f2 = B;
-
-      //if (f3 < C) f3+= (C/17)*60/frameRate; 
-      //else if ( f3 > C) f3-= (max(A, max(B, C))/17)*60/frameRate;
-      //else if (f3 <= C+(C/17)*60/frameRate && f3 >= C-(C/17)*60/frameRate) f3 = C;
-      //else f3 = C;
       f1 = int(CambiaF(A, B, C, f1, A));
       f2 = int(CambiaF(A, B, C, f2, B));
       f3 = int(CambiaF(A, B, C, f3, C));
@@ -540,6 +526,7 @@ public void cambiaColore(int x) {
 }
 
 private float CambiaF(int A, int B, int C, int F, int X) {
+  if (!animazione) return X;
   if (F < X) return F+(X/17)*60/frameRate; 
   else if ( F > X) return F-(max(A, max(B, C))/17)*60/frameRate;
   else if (F >= X+(X/17)*60/frameRate || F <= X-(X/17)*60/frameRate) return X;
