@@ -1,12 +1,13 @@
 //E' una features o e' un bug? //<>// //<>//
+import apwidgets.*;
 Square[][] s;
 Button[] b, b2;
 protected boolean con = false, imhere = true, rel = false, kel = false, scambio = false, delay = true;
 int size, rx, ry, cSQ = color(0), cSQ1, nMosse = 0, nQuad = 0, Col, nCol, f1, f2, f3;
 PImage rec[], play, logo;
 static String scene = "", cambia="", swap[];
-static boolean end = false, animazione = true, singleplayer =true, player1 = true, local = true, backpressed = false, nondevi = true;
-String parola[], grid[], colors[], fill[], diff[], record[], col[], visual[], datiutili[];
+static boolean end = false, animazione = true, singleplayer =true, player1 = true, local = true, backpressed = false, nondevi = true, musica=true, effetti=true, endsetup = false;
+String parola[], grid[], colors[], fill[], diff[], record[], col[], visual[], datiutili[], lingue[];
 static int lol = 0; //Uso in button
 //Variabili per l'animazione del rettangolo
 int nk = 0; 
@@ -14,17 +15,24 @@ boolean cont;
 float tS, sY; //
 int n=0, k=0, l=0, gr = 0, g1 =0, g2=0; //Indici di array (n = griglia) (k = colori) (l = difficolta') (gr = score) (g1 , g2 = punteggi finali)
 PFont font;
+APMediaPlayer aplose, apswipe, aptheme, aptic, apwin;
 public void settings() {
   orientation(PORTRAIT);
   size(PApplet.parseInt(displayHeight*0.5625f), displayHeight, P2D);
   //fullScreen(P2D);
+  aptheme = crea("theme.mp3");
+  aptheme.setLooping(true);
+  aptic = crea("tic.mp3");
+  apwin = crea("win.mp3");
+  aplose = crea("lose.mp3");
+  apswipe = crea("swipe.mp3");
 }
 
 public void setup() {
   // println(displayWidth, displayHeight);
   //println(System.getProperty("os.name"));
   rec = new PImage[2];
-  font = createFont("0.ttf", 30*width/360);
+  font = createFont("3.ttf", 27*width/360);
   textFont(font);
   rec[0] = loadImage("0.png");
   rec[1] = loadImage("1.png");
@@ -35,6 +43,7 @@ public void setup() {
   fill = loadStrings("fill.txt");
   col = loadStrings("fill.txt");
   diff = loadStrings("diff.txt");
+  lingue = loadStrings("lingue.txt");
   File f = new File(dataPath("savedata.txt"));
   if (f.exists())
     record = loadStrings(dataPath("savedata.txt"));
@@ -48,9 +57,14 @@ public void setup() {
     datiutili = loadStrings(dataPath("datiutili.txt"));
     parola = swap = loadStrings(datiutili[0]+".txt");
     animazione = boolean(datiutili[1]);
+    if (datiutili.length > 2) {
+      println(datiutili);
+      musica = boolean(datiutili[2]);
+      effetti = boolean(datiutili[3]);
+    }
   } else {
-    datiutili = new String[2];
-    datiutili[0] = datiutili[1] = "";
+    datiutili = new String[4];
+    for (int i = 0; i < datiutili.length; i++) datiutili[i] = "";
     parola = swap = loadStrings("Italiano.txt");
   }
   scene = parola[19];
@@ -60,6 +74,9 @@ public void setup() {
   scene = "logo";
   background(255);
   mouseY = height/10;
+  if (musica) 
+    parti(aptheme); //faccio partire la musica
+  endsetup=true;
 }
 
 public void draw() {
@@ -67,6 +84,7 @@ public void draw() {
   if ((mouseY > (sY+(tS*2))*height/640 || mouseY < sY*height/640) || rel) {
     nk = 0;  
     cont = false;
+    stoppa(aptic);//Resetto il suono della slide
   }
   if (scene.equals("logo")) {
     nondevi = true;
@@ -74,6 +92,7 @@ public void draw() {
     else if (frameCount > 200 && datiutili[0].equals("")) scene = "Linguaggiamelo";
     noTint();
     image(logo, 180*width/360, 320*height/640, 180*width/360, 180*width/360);
+    if (!musica) stoppa(aptheme);
   } else if (scene.equals(parola[19])) {
     menu();
   } else if (scene.equals("Menu-b")) {
@@ -96,7 +115,8 @@ public void draw() {
   } else if (scene.equals("Linguaggiamelo")) {
     background(0);
     text(parola[19], 180, 40, 30, colore(6), 6);
-    text("< "+parola[27]+": "+parola[28]+" >", 180, 220, 30, colore(0), 0);
+    text("< "+parola[27]+": "+parola[28]+" >", 180, 220, 30, colore(2), 2);
+
     if (rel && mouseY >= 180*height/640 && mouseY <= 260*height/640) scene = "x";
   } else if (scene.equals("x")) {
     cambialingua();
@@ -120,13 +140,19 @@ public void options() {
   text(parola[19], 180, 40, 30, colore(6), 6);
   text("< "+parola[26]+" >", 180, 120, 30, colore(0+(PApplet.parseInt(!animazione))), 0+(PApplet.parseInt(!animazione)));
   text("< "+parola[27]+": "+parola[28]+" >", 180, 220, 30, colore(0), 0);
+  text("< "+parola[29]+" >", 180, 320, 30, colore(2-PApplet.parseInt(!musica)), 2-PApplet.parseInt(!musica)); //verde se c'è la musica, altrimenti rossa 
+  text("< "+parola[30]+" >", 180, 420, 30, colore(2-PApplet.parseInt(!effetti)), 2-PApplet.parseInt(!effetti));// -   -  ci sono gli effetti, -      -
   if (rel && mouseY >= 80*height/640 && mouseY <= 160*height/640) animazione = !animazione;
   if (rel && mouseY >= 180*height/640 && mouseY <= 260*height/640) scene = "x";
+  if (rel && mouseY >= 280*height/640 && mouseY <= 360*height/640) musica = !musica;
+  if (rel && mouseY >= 380*height/640 && mouseY <= 460*height/640) effetti = !effetti;
+  if (!musica && rel) stoppa(aptheme);
+  if (musica && rel) parti(aptheme);
 }
-
+int lingua =0;
 public void cambialingua() {
-  if (parola[28].equals("English")) cambia = "Italiano";
-  else if (parola[28].equals("Italiano")) cambia = "English";
+  cambia = lingue[int(!(lingua+1>=lingue.length))*++lingua];
+  if (lingua >= lingue.length) lingua = 0;
   parola = loadStrings(cambia+".txt");
   if (!datiutili[0].equals("")) {
     scene = parola[1];
@@ -169,6 +195,7 @@ public void mouseReleased() {
 
 public void mousePressed() {
   rel = false;
+  nk = 0;
   scambio = false;
 }
 
@@ -231,6 +258,7 @@ public void creazioneGriglia(boolean uno) {
   }
   Col = nCol = cSQ = s[rx][ry].c;
   nMosse = nQuad = 0;
+  aptheme.setVolume(1.0, 1.0); //Rialzo il volume durante la partita
 }
 
 public void gioco_1() {
@@ -379,9 +407,7 @@ public void separa() {
   cSQ1 = s[s.length-1][s[0].length-1].c = colore(i+1);
 }
 public void gameover(boolean win) {
-  //int easy = n+k*(grid.length);
   String view[] = split(record[k], "_");
-  //println(easy);
   String ve;
   if (!end) { 
     for (int i = 0; i < s.length; i++) for (int j = 0; j < s[0].length; j++)  
@@ -413,6 +439,13 @@ public void gameover(boolean win) {
       }
       record[k] = deb;
       salvataggio("savedata.txt", record);
+      aptheme.setVolume(0.3, 0.3); //Abbasso il volume per far sentire la musica
+      if (effetti) {
+        stoppa(apwin);
+        stoppa(aplose);
+        if (win) parti(apwin); 
+        else parti(aplose);
+      }
     }
   }
   end = true;
@@ -427,6 +460,7 @@ public void gameover(boolean win) {
   if (!win)  text(parola[23]+"\n"+(nQuad*(100))/(s.length*s[0].length)+"% "+parola[7], 180, 160, 35);
   else if (win && singleplayer)text(parola[8]+" \n 100% "+parola[7]+"\n"+nMosse+" "+parola[9], 180, 160, 35);
   else  text(parola[21]+g1+"\n"+parola[22]+g2, 180, 180, 35);
+
 
   if (mouseX >= 230*width/360 && mouseY >= 400*height/640 && mouseX <= 310*width/360 && mouseY <= 460*height/640 && end && rel) {
     reset(false);
@@ -527,9 +561,9 @@ public void cambiaColore(int x) {
 
 private float CambiaF(int A, int B, int C, int F, int X) {
   if (!animazione) return X;
+  if (F <= X+(X/17)*60/frameRate && F >= X-(X/17)*60/frameRate) return X;
   if (F < X) return F+(X/17)*60/frameRate; 
   else if ( F > X) return F-(max(A, max(B, C))/17)*60/frameRate;
-  else if (F >= X+(X/17)*60/frameRate || F <= X-(X/17)*60/frameRate) return X;
   else return X;
 }
 
@@ -546,21 +580,24 @@ public void movimentoRec(float y, float lx, float ts, int l) {
 }
 
 public void text(String a, float x, float y, float ts) {
-  //textSize(ts*width/360);
   textSize(ts*width/360);
   text(a, x*width/360, y*height/640);
 }
 public void text(String a, float x, float y, float ts, int fil, int i) {
   fill(fil);
   if (mouseY >= (y-ts*1.5f)*height/640 && mouseY <= (y+ts/2)*height/640) { 
+    if (effetti && nk == 0 && mousePressed) parti(aptic);
     movimentoRec(y, nk+=60*60/frameRate, ts, i);
     tint(0);
     cont = true;
     if (rel && (scene.equals(parola[19]) || a.equals(parola[19]))) {
       if (rel && (scene.equals(parola[1]) || scene.equals("Linguaggiamelo"))) {
+        datiutili = new String[4];
         println("Sto salvando!");
         datiutili[0] = parola[28];
         datiutili[1] = str(animazione);
+        datiutili[2] = str(musica);
+        datiutili[3] = str(effetti);
         salvataggio("datiutili.txt", datiutili);
         println("Ho finito di salvare, pezzo di merda!");
       }
@@ -573,9 +610,8 @@ public void text(String a, float x, float y, float ts, int fil, int i) {
       k = gr;
       n = PApplet.parseInt((y-152.5f)/45);
     }
-  } else tint(fil);
-
-  //textFont(font, ts*width/360);
+  } else 
+  tint(fil);
   textSize(ts*width/360);
   text(a, x*width/360, y*height/640);
 }

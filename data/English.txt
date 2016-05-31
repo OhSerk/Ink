@@ -27,3 +27,5 @@ Multiplayer
 Animation
 Language
 English
+Music
+Effects

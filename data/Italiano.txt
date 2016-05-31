@@ -27,3 +27,5 @@ Multigiocatore
 Animazione
 Lingua
 Italiano
+Musica
+Effetti

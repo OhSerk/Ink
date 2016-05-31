@@ -22,19 +22,25 @@ public class Button {
     stroke(255);
     rect(px, py, 50*6/PApplet.parseInt(colors[k]), 50*6/PApplet.parseInt(colors[k]), color(c));
     fill(0);
-   // text(str(i), px+25*6/PApplet.parseInt(colors[k]), py+dim/2, 20);
+    noStroke();
+
+    // text(str(i), px+25*6/PApplet.parseInt(colors[k]), py+dim/2, 20);
     if (((mouseX >= px*width/360 && mouseX <= (px+(50*6/PApplet.parseInt(colors[k])))*width/360 && mouseY >= py*height/640 && mouseY <= (py+(50*6/PApplet.parseInt(colors[k])))*height/640 && rel)
-    || (str(key).equals(str(i)) && kel)) && !end && scene.equals("R-Play") && con) { //Se clicci sul bottone, il gioco non è finito, stai giocando e è finita l'animazione oppure non c'è allora fai..
+      || (str(key).equals(str(i)) && kel)) && !end && scene.equals("R-Play") && con) { //Se clicci sul bottone, il gioco non è finito, stai giocando e è finita l'animazione oppure non c'è allora fai..
       //println("x");
       for (int j = 0; j < s[0].length; j++)
         for (int i = 0; i < s.length; i++)
           if (s[i][j].controller() && turno == s[i][j].giocatore)
-              if (s[i][j].realC != this.c && s[i][j].c != this.c && (s[i][j].realC != colore(lol)||singleplayer)) {// && (s[0][0].realC != s[s.length-1][s[0].length-1].realC || singleplayer)) {
-                Col = s[i][j].realC = this.c;
-                //if (!animazione && player1) cSQ = this.c;
-                //if (!animazione && !player1) cSQ1 = this.c;
-                scambio = true;
-              } //else imhere = true;
+            if (s[i][j].realC != this.c && s[i][j].c != this.c && (s[i][j].realC != colore(lol)||singleplayer)) {// && (s[0][0].realC != s[s.length-1][s[0].length-1].realC || singleplayer)) {
+              Col = s[i][j].realC = this.c;
+              if (effetti && rel && animazione) { 
+                stoppa(apswipe);
+                parti(apswipe);
+              }
+              //if (!animazione && player1) cSQ = this.c;
+              //if (!animazione && !player1) cSQ1 = this.c;
+              scambio = true;
+            } //else imhere = true;
       if (scambio) {
         //println("sc");
         lol = this.i;

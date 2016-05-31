@@ -20,11 +20,11 @@ public class Square {
       if (c == Col || nMosse == 0)
         newController();
       C = c;
-    } else
+    } else {
       C = realC;
-    noStroke();    
+    }
     rect(px, py, dim, dim, color(C));
-    
+
     /* if (giocatore == 0) {
      fill(color(0));
      text("x", px+dim/2, py+dim/2, 10);
