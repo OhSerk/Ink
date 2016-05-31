@@ -1,4 +1,4 @@
-/*import android.os.Bundle;
+import android.os.Bundle;
  import android.view.Gravity;
  import android.view.Window;
  import android.view.WindowManager;
@@ -22,9 +22,9 @@
  adView.loadAd(newAdReq);
  window.addContentView(adsLayout, lp2);
  */
-/*
+
 }
- */
+
 @Override
   public void onPause() {
   super.onPause();

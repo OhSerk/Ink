@@ -33,10 +33,6 @@ public class Button {
           if (s[i][j].controller() && turno == s[i][j].giocatore)
             if (s[i][j].realC != this.c && s[i][j].c != this.c && (s[i][j].realC != colore(lol)||singleplayer)) {// && (s[0][0].realC != s[s.length-1][s[0].length-1].realC || singleplayer)) {
               Col = s[i][j].realC = this.c;
-              if (effetti && rel && animazione) { 
-                stoppa(apswipe);
-                parti(apswipe);
-              }
               //if (!animazione && player1) cSQ = this.c;
               //if (!animazione && !player1) cSQ1 = this.c;
               scambio = true;
@@ -47,6 +43,10 @@ public class Button {
         delay = true;
         nMosse++;
         scambio = false;
+        if (effetti && animazione) { 
+          stoppa(apswipe);
+          parti(apswipe);
+        }
       }
       rel = false;
       mouseX = 0;
