@@ -1,5 +1,40 @@
-//E' una features o e' un bug? //<>// //<>//
-import apwidgets.*;
+package processing.test.ink;
+
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import apwidgets.*; 
+import android.os.Bundle; 
+import android.view.Gravity; 
+import android.view.Window; 
+import android.view.WindowManager; 
+import android.widget.RelativeLayout; 
+import com.google.ads.*; 
+
+import com.google.ads.*; 
+import com.google.ads.doubleclick.*; 
+import com.google.ads.internal.*; 
+import com.google.ads.mediation.*; 
+import com.google.ads.mediation.admob.*; 
+import com.google.ads.mediation.customevent.*; 
+import com.google.ads.searchads.*; 
+import com.google.ads.util.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class Ink extends PApplet {
+
+//E' una features o e' un bug? //<>//
+
 Square[][] s;
 Button[] b, b2;
 Keyboard Key[] = new Keyboard[27];
@@ -58,11 +93,11 @@ public void setup() {
     println("porcodio");
     datiutili = loadStrings(dataPath("datiutili.txt"));
     parola = swap = loadStrings(datiutili[0]+".txt");
-    animazione = boolean(datiutili[1]);
+    animazione = PApplet.parseBoolean(datiutili[1]);
     if (datiutili.length > 2) {
       println(datiutili);
-      musica = boolean(datiutili[2]);
-      effetti = boolean(datiutili[3]);
+      musica = PApplet.parseBoolean(datiutili[2]);
+      effetti = PApplet.parseBoolean(datiutili[3]);
     }
   } else {
     datiutili = new String[4];
@@ -88,9 +123,9 @@ public void setup() {
     int ii = i;
     if (i >= 10) ii -= 10;
     if (i > 18) ii -= 7;
-    Key[i] = new Keyboard((tastiera[i]), 30+30*ii, 340+60*int(i >= 10)+60*int(i > 18), 22);
+    Key[i] = new Keyboard((tastiera[i]), 30+30*ii, 340+60*PApplet.parseInt(i >= 10)+60*PApplet.parseInt(i > 18), 22);
   }
-  Key[26] = new Keyboard("←", 320, 420, 30);
+  Key[26] = new Keyboard("\u2190", 320, 420, 30);
 }
 
 public void draw() {
@@ -167,7 +202,7 @@ public void options() {
   text(parola[19], 180, 40, 30, colore(6), 6);
   text("< "+parola[26]+" >", 180, 120, 30, colore(0+(PApplet.parseInt(!animazione))), 0+(PApplet.parseInt(!animazione)));
   text("< "+parola[27]+": "+parola[28]+" >", 180, 220, 30, colore(0), 0);
-  text("< "+parola[29]+" >", 180, 320, 30, colore(2-PApplet.parseInt(!musica)), 2-PApplet.parseInt(!musica)); //verde se c'è la musica, altrimenti rossa 
+  text("< "+parola[29]+" >", 180, 320, 30, colore(2-PApplet.parseInt(!musica)), 2-PApplet.parseInt(!musica)); //verde se c'\u00e8 la musica, altrimenti rossa 
   text("< "+parola[30]+" >", 180, 420, 30, colore(2-PApplet.parseInt(!effetti)), 2-PApplet.parseInt(!effetti));// -   -  ci sono gli effetti, -      -
   text(parola[31], 180, 520, 30, colore(4), 4);
   if (rel && mouseY >= 80*height/640 && mouseY <= 160*height/640) animazione = !animazione;
@@ -179,7 +214,7 @@ public void options() {
 }
 int lingua =0;
 public void cambialingua() {
-  cambia = lingue[int(!(lingua+1>=lingue.length))*++lingua];
+  cambia = lingue[PApplet.parseInt(!(lingua+1>=lingue.length))*++lingua];
   if (lingua >= lingue.length) lingua = 0;
   parola = loadStrings(cambia+".txt");
   if (!datiutili[0].equals("")) {
@@ -289,7 +324,7 @@ public void creazioneGriglia(boolean uno) {
   }
   Col = nCol = cSQ = s[rx][ry].c;
   nMosse = nQuad = 0;
-  aptheme.setVolume(1.0, 1.0); //Rialzo il volume durante la partita
+  aptheme.setVolume(1.0f, 1.0f); //Rialzo il volume durante la partita
 }
 
 public void gioco_1() {
@@ -466,7 +501,7 @@ public void gameover(boolean win) {
       }
       record[k] = deb;
       salvataggio("savedata.txt", record);
-      aptheme.setVolume(0.3, 0.3); //Abbasso il volume per far sentire la musica
+      aptheme.setVolume(0.3f, 0.3f); //Abbasso il volume per far sentire la musica
       if (effetti) {
         stoppa(apwin);
         stoppa(aplose);
@@ -570,9 +605,9 @@ public void cambiaColore(int x) {
     String[] y = split(col[i], ',');
     int A=PApplet.parseInt(y[0]), B=PApplet.parseInt(y[1]), C=PApplet.parseInt(y[2]);
     if (x == color(A, B, C)) {
-      f1 = int(CambiaF(A, B, C, f1, A));
-      f2 = int(CambiaF(A, B, C, f2, B));
-      f3 = int(CambiaF(A, B, C, f3, C));
+      f1 = PApplet.parseInt(CambiaF(A, B, C, f1, A));
+      f2 = PApplet.parseInt(CambiaF(A, B, C, f2, B));
+      f3 = PApplet.parseInt(CambiaF(A, B, C, f3, C));
     }
     if (player1||singleplayer) {
       cSQ = color(f1, f2, f3);
@@ -661,4 +696,240 @@ public void ellipse(float x, float y, float dim, float dim2, int c) {
   if (c <= 0)fill(c); 
   else noFill();
   ellipse(x*width/360, y*height/640, dim*width/360, dim2*width/360);
+}
+
+public class Button {
+  private int px, c, py, dim;
+  public int i;
+  private int turno;
+  Button(int px, int c, int i) {
+    this.px = px;
+    this.c = c;
+    this.i = i;
+    py = 480;
+    dim = 50;
+    turno = 0;
+  }
+  Button(int px, int py, int c, int i, int turno) {
+    this.px = px;
+    this.c = c;
+    this.i = i;
+    this.py = py;
+    this.turno = turno;
+    dim = 35;
+  }
+  public void view() {
+    stroke(255);
+    rect(px, py, 50*6/PApplet.parseInt(colors[k]), 50*6/PApplet.parseInt(colors[k]), color(c));
+    fill(0);
+    noStroke();
+
+    // text(str(i), px+25*6/PApplet.parseInt(colors[k]), py+dim/2, 20);
+    if (((mouseX >= px*width/360 && mouseX <= (px+(50*6/PApplet.parseInt(colors[k])))*width/360 && mouseY >= py*height/640 && mouseY <= (py+(50*6/PApplet.parseInt(colors[k])))*height/640 && rel)
+      || (str(key).equals(str(i)) && kel)) && !end && scene.equals("R-Play") && con) { //Se clicci sul bottone, il gioco non \u00e8 finito, stai giocando e \u00e8 finita l'animazione oppure non c'\u00e8 allora fai..
+      //println("x");
+      for (int j = 0; j < s[0].length; j++)
+        for (int i = 0; i < s.length; i++)
+          if (s[i][j].controller() && turno == s[i][j].giocatore)
+            if (s[i][j].realC != this.c && s[i][j].c != this.c && (s[i][j].realC != colore(lol)||singleplayer)) {// && (s[0][0].realC != s[s.length-1][s[0].length-1].realC || singleplayer)) {
+              Col = s[i][j].realC = this.c;
+              scambio = true;
+            } //else imhere = true;
+      if (scambio) {
+        //println("sc");
+        lol = this.i;
+        delay = true;
+        nMosse++;
+        scambio = false;
+        if (effetti && animazione) {           stoppa(apswipe);         parti(apswipe);}
+      }
+      rel = false;
+      mouseX = 0;
+    } else if (mouseX >= px*width/360 && mouseX <= (px+(50*6/PApplet.parseInt(colors[k])))*width/360 && mouseY >= 530*height/640 && mouseY <= 580*height/640 ) {
+    }
+  }
+}
+
+
+
+
+
+/*import android.view.InputEvent;
+ import android.view.MotionEvent;
+ import android.view.inputmethod.InputMethodManager;
+ import android.content.Context;*/
+
+@Override
+  public void onCreate(Bundle savedInstanceState) {
+  super.onCreate(savedInstanceState);
+  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+  Window window = getWindow();
+  //inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+  RelativeLayout adsLayout = new RelativeLayout(this);
+  RelativeLayout.LayoutParams lp2 = new RelativeLayout.LayoutParams(
+    RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.FILL_PARENT);
+  // Per vedere il banner in basso allo sketch ,altrimenti TOP per vederlo in alto
+  adsLayout.setGravity(Gravity.BOTTOM);             
+  AdView  adView = new AdView(this, AdSize.BANNER, "ca-app-pub-8490206152530240/1329072018");  // add your app-id
+  adsLayout.addView(adView);
+  AdRequest newAdReq = new AdRequest();
+  adView.loadAd(newAdReq);
+  window.addContentView(adsLayout, lp2);
+}
+
+@Override
+  public void onPause() {
+  super.onPause();
+  aptheme.pause();
+}
+@Override
+  public void onStop() {
+  super.onStop();
+  aptheme.pause();
+}
+@Override
+  public void onDestroy() {
+  super.onDestroy();
+  distruggi(aptheme);
+  distruggi(aplose);
+  distruggi(apwin);
+  distruggi(apswipe);
+  distruggi(aptic);
+}
+@Override
+  public void onResume() {
+  super.onResume();
+  if (musica&& endsetup)parti(aptheme);
+}
+@Override
+  public void onUserInteraction() {
+  super.onUserInteraction();
+  //if (inputMethodManager != null) {
+  //inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+  //}
+}
+
+public void distruggi(APMediaPlayer a) {
+  if (a!=null) a.release();
+}
+
+public void parti(APMediaPlayer a) {
+  if (a!=null) a.start();
+}
+
+public void stoppa(APMediaPlayer a) {
+  if (a!= null) {
+    a.seekTo(0);
+    a.pause();
+  }
+}
+
+public APMediaPlayer crea(String b) {
+  APMediaPlayer a;
+  a = new APMediaPlayer(this);
+  a.setMediaFile(b);
+  a.setVolume(1.0f, 1.0f);
+  a.setLooping(false);
+  return a;
+}
+public class Square {
+  private int x, y;
+  private float  px, py, dim;
+  int c, realC;
+  int nc, NC;
+  private boolean controller;
+  public int giocatore = 2;
+  Square (int x, int y, float px, float py, boolean controller, float dim) {
+    this.x = x;
+    this.y = y;
+    this.px = px;
+    this.py = py;
+    this.dim = dim;
+    this.controller = controller;
+    c = realC = nc = NC= colore();
+  }
+  public void view() {
+    int C;
+    if (controller) {
+      if (c == Col || nMosse == 0)
+        newController();
+      C = c;
+    } else {
+      C = realC;
+    }
+    rect(px, py, dim, dim, color(C));
+  }
+  public int colore() {
+    String[] x = split(col[RI(b.length)], ',');
+    return color(PApplet.parseInt(x[0]), PApplet.parseInt(x[1]), PApplet.parseInt(x[2]));
+  }
+
+  public void newController() {
+    if (x+1 != s.length) pigrizia(x+1, y);
+    if (x-1 >= 0) pigrizia(x-1, y);
+    if (y+1 != s[0].length) pigrizia(x, y+1);
+    if (y-1 >= 0) pigrizia(x, y-1);
+  }
+
+  public void pigrizia(int a, int b) {
+    if ((str(s[a][b].realC).equals(str(s[x][y].realC)) || str(s[a][b].c).equals(str(s[x][y].c))) && s[a][b].giocatore == 2) {
+      s[a][b].controller = true;
+      s[a][b].giocatore = s[x][y].giocatore;
+      if (giocatore == 0) g2++;
+      else if (giocatore == 1) g1++;
+    }
+  }
+
+  public void controller(boolean ll, int giocatore) {
+    controller = ll;
+    this.giocatore = giocatore;
+    c = nc;
+    realC = NC;
+  }
+  public boolean controller() {
+    return controller;
+  }
+}
+public class Keyboard {
+  String Key;
+  float x, y, si;
+  Keyboard(String Key, float x, float y, float si) {
+    this.Key = Key;
+    this.x = x;
+    this.y = y;
+    this.si = si;
+  }
+
+  public void view() {
+    stroke(255);
+    rect(x-15, y-20, 30, 30, color(0));
+    if (mouseX >= (x-15)*width/360 && mouseX <= (x+15)*width/360 && mouseY >= (y-20)*height/640 && mouseY <= (y+10)*height/640) {
+      fill(255, 0, 0);
+      if (rel) {
+        if (!Key.equals("\u2190") && nomeGiocatore[1].length() <= 10)
+          if (nomeGiocatore[1].length() >= 1)
+            nomeGiocatore[1] += Key.toLowerCase();
+          else 
+          nomeGiocatore[1] += Key;
+        else if (Key.equals("\u2190")) {
+          String deb = "";
+          for (int i = 0; i < nomeGiocatore[1].length()-1; i++) {
+            deb += str(nomeGiocatore[1].charAt(i));
+          }
+          nomeGiocatore[1] = deb;
+        }
+        fill(255);
+      }
+    } else fill(255);
+    text(Key, x, y, si);
+  }
+}
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "Ink" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
 }

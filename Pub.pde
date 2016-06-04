@@ -1,28 +1,13 @@
 import android.os.Bundle;
- import android.view.Gravity;
- import android.view.Window;
- import android.view.WindowManager;
- import android.widget.RelativeLayout;
- import com.google.ads.*;
- 
- @Override
- public void onCreate(Bundle savedInstanceState) {
- super.onCreate(savedInstanceState);
- getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-/*
- Window window = getWindow();
- RelativeLayout adsLayout = new RelativeLayout(this);
- RelativeLayout.LayoutParams lp2 = new RelativeLayout.LayoutParams(
- RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.FILL_PARENT);
- // Per vedere il banner in basso allo sketch ,altrimenti TOP per vederlo in alto
- adsLayout.setGravity(Gravity.BOTTOM);             
- AdView  adView = new AdView(this, AdSize.BANNER, "ca-app-pub-8490206152530240/1329072018");  // add your app-id
- adsLayout.addView(adView);
- AdRequest newAdReq = new AdRequest();
- adView.loadAd(newAdReq);
- window.addContentView(adsLayout, lp2);
- */
-
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
+import com.google.ads.*;
+@Override
+  public void onCreate(Bundle savedInstanceState) {
+  super.onCreate(savedInstanceState);
+  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 }
 
 @Override
@@ -48,6 +33,13 @@ import android.os.Bundle;
   public void onResume() {
   super.onResume();
   if (musica&& endsetup)parti(aptheme);
+}
+@Override
+  public void onUserInteraction() {
+  super.onUserInteraction();
+  //if (inputMethodManager != null) {
+  //inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+  //}
 }
 
 public void distruggi(APMediaPlayer a) {

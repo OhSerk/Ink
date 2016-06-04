@@ -24,18 +24,6 @@ public class Square {
       C = realC;
     }
     rect(px, py, dim, dim, color(C));
-
-    /* if (giocatore == 0) {
-     fill(color(0));
-     text("x", px+dim/2, py+dim/2, 10);
-     } else if ( giocatore == 1) {
-     fill(color(0));
-     text("y", px+dim/2, py+dim/2, 10);
-     } else {
-     //fill(color(0));
-     //text("z", px+dim/2, py+dim/2, 10);
-     }
-     }*/
   }
   public int colore() {
     String[] x = split(col[RI(b.length)], ',');
