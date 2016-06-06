@@ -124,7 +124,8 @@ public void draw() {
     options();
   } else if (scene.equals(parola[3])) {
     background(0);
-    text("Serk", 180, 320, 40, colore(6), 6);
+    fill(255);
+    text("Serk", 180, 320, 40);
     text(parola[19], 180, 40, 30, colore(6), 6);
   } else if (scene.equals("Linguaggiamelo")) {
     background(0);
