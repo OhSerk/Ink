@@ -31,7 +31,7 @@ public void settings() {
 }
 
 public void setup() {
-  // println(displayWidth, displayHeight);
+  //println(displayWidth, displayHeight);
   //println(System.getProperty("os.name"));
   rec = new PImage[2];
   font = createFont("3.ttf", 27*width/360);
@@ -102,12 +102,13 @@ public void draw() {
   }
   if (scene.equals("logo")) {
     nondevi = true;
-    if (frameCount > 200 && !datiutili[0].equals("")) scene = parola[19];
+    if (frameCount > 200 && nomeGiocatore[1].equals("")) scene = parola[31];
+    else if (frameCount > 200 && !datiutili[0].equals("")) scene = parola[19];
     else if (frameCount > 200 && datiutili[0].equals("")) scene = "Linguaggiamelo";
     noTint();
     image(logo, 180*width/360, 320*height/640, 180*width/360, 180*width/360);
     if (!musica) stoppa(aptheme);
-  } else if (scene.equals(parola[19]) && !nomeGiocatore[0].equals("/")) {
+  } else if (scene.equals(parola[19]) && !nomeGiocatore[1].equals("")) {
     menu();
   } else if (scene.equals("Menu-b")) {
     reset(false);
@@ -197,7 +198,7 @@ public void onBackPressed() {
     Ink.scene = Ink.swap[19];
   }
   nk = 0;
-  
+
   return;
 }
 
