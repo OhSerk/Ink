@@ -1,4 +1,4 @@
-public class Keyboard {
+/*public class Keyboard {
   String Key;
   float x, y, si;
   Keyboard(String Key, float x, float y, float si) {
@@ -31,4 +31,4 @@ public class Keyboard {
     } else fill(255);
     text(Key, x, y, si);
   }
-}
+}*/
